@@ -10,6 +10,7 @@ interface ProductGridProps {
 export default function ProductGrid({ category, searchQuery }: ProductGridProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
   const [subcategories, setSubcategories] = useState<string[]>([]);
 
@@ -19,6 +20,7 @@ export default function ProductGrid({ category, searchQuery }: ProductGridProps)
 
   async function fetchProducts() {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('products')
@@ -44,8 +46,9 @@ export default function ProductGrid({ category, searchQuery }: ProductGridProps)
         ),
       ];
       setSubcategories(uniqueSubcategories);
-    } catch (error) {
-      console.error('Error fetching products:', error);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError('Failed to load products. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -71,6 +74,16 @@ export default function ProductGrid({ category, searchQuery }: ProductGridProps)
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <p className="text-red-700">{error}</p>
+        </div>
       </div>
     );
   }
